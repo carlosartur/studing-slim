@@ -3,6 +3,7 @@
 namespace App\DI;
 
 use App\Controller\UserController;
+use App\Controller\ProductController;
 use Doctrine\ORM\EntityManager;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -23,6 +24,12 @@ final class Slim implements ServiceProvider
             );
         });
 
+        $c->set(ProductController::class, static function (ContainerInterface $c) {
+            return new ProductController(
+                $c->get(EntityManager::class)
+            );
+        });
+
         $c->set(App::class, static function (ContainerInterface $c): App {
             /** @var array $settings */
             $settings = $c->get('settings');
@@ -37,9 +44,9 @@ final class Slim implements ServiceProvider
 
             $app->add(new ContentLengthMiddleware());
             $app->addBodyParsingMiddleware();
+
             UserController::generateRoutes($app);
-            // $app->get('/users', UserController::class . ":list");
-            // $app->post('/users', CreateUser::class);
+            ProductController::generateRoutes($app);
 
             return $app;
         });

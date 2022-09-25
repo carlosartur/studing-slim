@@ -2,9 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Product;
 use Doctrine\ORM\EntityManager;
-use App\Entity\User;
-use App\Controller\AutoRotingController;
 use Exception;
 use Fig\Http\Message\StatusCodeInterface;
 use Laminas\Diactoros\Response\JsonResponse;
@@ -12,7 +11,7 @@ use Slim\Exception\HttpNotFoundException;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 
-final class UserController extends AutoRotingController
+class ProductController extends AutoRotingController
 {
     private EntityManager $em;
 
@@ -24,20 +23,21 @@ final class UserController extends AutoRotingController
     public function getAction(Request $request, Response $response, ?int $id = null)
     {
         try {
-            $repository = $this->em->getRepository(User::class);
-            $user = $id
+            $repository = $this->em->getRepository(Product::class);
+
+            $product = $id
                 ? $repository->findOneBy(compact("id"))
                 : $repository->findByQueryParams($request->getQueryParams());
 
-            if (!$user) {
-                throw new HttpNotFoundException($request, "User {$id} not found");
+            if (!$product) {
+                throw new HttpNotFoundException($request, "Product {$id} not found");
             }
 
-            if (!is_array($user)) {
-                $user = [$user];
+            if (!is_array($product)) {
+                $product = [$product];
             }
 
-            return new JsonResponse($user);
+            return new JsonResponse($product);
         } catch (HttpNotFoundException $exception) {
             return new JsonResponse(["message" => $exception->getMessage()], StatusCodeInterface::STATUS_NOT_FOUND);
         } catch (Exception $exception) {
@@ -49,18 +49,20 @@ final class UserController extends AutoRotingController
     {
         try {
             $data = $request->getParsedBody();
-            $email = $data["email"];
+            $newProduct = Product::createFromRequest($data);
 
-            $newUser = new User($email);
-
-            $this->em->persist($newUser);
+            $this->em->persist($newProduct);
             $this->em->flush();
 
-            $this->em->refresh($newUser);
+            $this->em->refresh($newProduct);
 
-            return new JsonResponse($newUser, StatusCodeInterface::STATUS_CREATED);
+            return new JsonResponse($newProduct, StatusCodeInterface::STATUS_CREATED);
         } catch (Exception $exception) {
             return new JsonResponse(["message" => $exception->getMessage()], StatusCodeInterface::STATUS_BAD_REQUEST);
         }
+    }
+
+    public function putAction(Request $request, Response $response)
+    {
     }
 }

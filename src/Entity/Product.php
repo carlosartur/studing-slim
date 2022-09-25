@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Repository\Product as RepositoryProduct;
 use DateTime;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -10,8 +11,9 @@ use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Table;
 use Cocur\Slugify\Slugify;
 use JsonSerializable;
+use stdClass;
 
-#[Entity(repositoryClass: RepositoryUser::class), Table(name: 'products')]
+#[Entity(repositoryClass: RepositoryProduct::class), Table(name: 'products')]
 final class Product implements JsonSerializable
 {
     #[Id, Column(type: 'integer'), GeneratedValue(strategy: 'AUTO')]
@@ -22,6 +24,9 @@ final class Product implements JsonSerializable
 
     #[Column(type: 'string', unique: true, nullable: false)]
     private string $slug;
+
+    #[Column(name: 'image_url', type: 'string', nullable: true)]
+    private ?string $imageUrl;
 
     #[Column(type: 'integer', nullable: false)]
     private int $price = 0;
@@ -35,12 +40,51 @@ final class Product implements JsonSerializable
     #[Column(name: 'updated_at', type: 'datetimetz', nullable: false)]
     private DateTime $updatedAt;
 
+    public function __construct()
+    {
+        $this->createdAt = new DateTime();
+        $this->updatedAt = new DateTime();
+    }
+
+    /**
+     * Create a new product from request.
+     *
+     * @param array|stdClass $requestBody
+     * @return self
+     */
+    public static function createFromRequest(array|stdClass $requestBody): self
+    {
+        if (is_array($requestBody)) {
+            $requestBody = (object) $requestBody;
+        }
+
+        $self = new self();
+        if (isset($requestBody->name)) {
+            $self->setName($requestBody->name);
+        }
+
+        if (isset($requestBody->price)) {
+            $self->setPrice($requestBody->price);
+        }
+
+        if (isset($requestBody->stock)) {
+            $self->setStock($requestBody->stock);
+        }
+
+        if (isset($requestBody->image_url)) {
+            $self->setStock($requestBody->image_url);
+        }
+
+        return $self;
+    }
+
     public function jsonSerialize(): mixed
     {
         return [
             "id" => $this->getId(),
             "name" => $this->getName(),
             "slug" => $this->getSlug(),
+            "image_url" => $this->getImageUrl(),
             "price" => $this->getPrice(),
             "stock" => $this->getStock(),
             "updated_at" => $this->getUpdatedAt(),
@@ -175,6 +219,26 @@ final class Product implements JsonSerializable
     public function setStock(int $stock): self
     {
         $this->stock = $stock;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of imageUrl
+     */
+    public function getImageUrl(): ?string
+    {
+        return $this->imageUrl;
+    }
+
+    /**
+     * Set the value of imageUrl
+     *
+     * @return  self
+     */
+    public function setImageUrl(?string $imageUrl): self
+    {
+        $this->imageUrl = $imageUrl;
 
         return $this;
     }
