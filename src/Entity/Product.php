@@ -54,28 +54,38 @@ final class Product implements JsonSerializable
      */
     public static function createFromRequest(array|stdClass $requestBody): self
     {
+        return (new self())->fillDataFromRequest($requestBody);
+    }
+
+    /**
+     * Fill data from request
+     *
+     * @param array|stdClass $requestBody
+     * @return self
+     */
+    public function fillDataFromRequest(array|stdClass $requestBody): self
+    {
         if (is_array($requestBody)) {
             $requestBody = (object) $requestBody;
         }
 
-        $self = new self();
         if (isset($requestBody->name)) {
-            $self->setName($requestBody->name);
+            $this->setName($requestBody->name);
         }
 
         if (isset($requestBody->price)) {
-            $self->setPrice($requestBody->price);
+            $this->setPrice($requestBody->price);
         }
 
         if (isset($requestBody->stock)) {
-            $self->setStock($requestBody->stock);
+            $this->setStock($requestBody->stock);
         }
 
         if (isset($requestBody->image_url)) {
-            $self->setStock($requestBody->image_url);
+            $this->setImageUrl($requestBody->image_url);
         }
 
-        return $self;
+        return $this;
     }
 
     public function jsonSerialize(): mixed
