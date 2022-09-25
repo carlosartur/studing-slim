@@ -27,6 +27,18 @@ abstract class AutoRotingController
 
     protected const PATCH_ACTION_METHOD = 'patchAction';
 
+    protected const HTTP_METHOD_GET = 'GET';
+
+    protected const HTTP_METHOD_POST = 'POST';
+
+    protected const HTTP_METHOD_PUT = 'PUT';
+
+    protected const HTTP_METHOD_DELETE = 'DELETE';
+
+    protected const HTTP_METHOD_OPTIONS = 'OPTIONS';
+
+    protected const HTTP_METHOD_PATCH = 'PATCH';
+
     public const TYPES_REGEX = [
         "int" => '[0-9]+',
         "float" => '[+-]?([0-9]*[.])?[0-9]+',
@@ -69,46 +81,59 @@ abstract class AutoRotingController
     {
         $path = self::buildRoutePath($method, $prefix);
 
-        $name = $method->getName();
+        $methodName = $method->getName();
 
         $actualClassName = static::class;
 
-        $nameUcfirst = ucfirst($name);
+        $nameUcfirst = ucfirst($methodName);
         $callable = "{$actualClassName}:callMethod{$nameUcfirst}";
 
-        switch ($name) {
+        $isRouteMethod = false;
+        $httpMethod = null;
+
+        switch ($methodName) {
             case static::GET_ACTION_METHOD:
-                static::$generatedRoutes[] = compact('path', 'callable');
                 $app->get($path, $callable);
-                return true;
+                $isRouteMethod = true;
+                $httpMethod = self::HTTP_METHOD_GET;
+                break;
 
             case static::POST_ACTION_METHOD:
-                static::$generatedRoutes[] = compact('path', 'callable');
                 $app->post($path, $callable);
-                return true;
+                $isRouteMethod = true;
+                $httpMethod = self::HTTP_METHOD_POST;
+                break;
 
             case static::PUT_ACTION_METHOD:
-                static::$generatedRoutes[] = compact('path', 'callable');
                 $app->put($path, $callable);
-                return true;
+                $isRouteMethod = true;
+                $httpMethod = self::HTTP_METHOD_PUT;
+                break;
 
             case static::DELETE_ACTION_METHOD:
-                static::$generatedRoutes[] = compact('path', 'callable');
                 $app->delete($path, $callable);
-                return true;
+                $isRouteMethod = true;
+                $httpMethod = self::HTTP_METHOD_DELETE;
+                break;
 
             case static::OPTIONS_ACTION_METHOD:
-                static::$generatedRoutes[] = compact('path', 'callable');
                 $app->options($path, $callable);
-                return true;
+                $isRouteMethod = true;
+                $httpMethod = self::HTTP_METHOD_OPTIONS;
+                break;
 
             case static::PATCH_ACTION_METHOD:
-                static::$generatedRoutes[] = compact('path', 'callable');
                 $app->patch($path, $callable);
-                return true;
+                $isRouteMethod = true;
+                $httpMethod = self::HTTP_METHOD_PATCH;
+                break;
         }
 
-        return false;
+        if ($isRouteMethod) {
+            static::$generatedRoutes[] = compact('path', 'callable', 'methodName', 'httpMethod');
+        }
+
+        return $isRouteMethod;
     }
 
     /**
