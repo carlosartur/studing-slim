@@ -1,0 +1,28 @@
+version: '3'
+
+Controller:
+  app:
+    image: adhocore/lemp:8.1
+    # For different app you can use different names. (eg: )
+    container_name: some-app
+    build: .
+    volumes:
+      # app source code
+      - ./:/var/www/html
+      # db data persistence
+      - db_data:/var/lib/mysql
+      # Here you can also volume php ini settings
+      # - /path/to/zz-overrides:/usr/local/etc/php/conf.d/zz-overrides.ini
+    ports:
+      - 8080:80
+      - 8888:8888
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: supersecurepwd
+      MYSQL_DATABASE: appdb
+      MYSQL_USER: dbusr
+      MYSQL_PASSWORD: securepwd
+      # for postgres you can pass in similar env as for mysql but with PGSQL_ prefix
+
+volumes:
+  db_data: {}
