@@ -1,6 +1,6 @@
 version: '3'
 
-Controller:
+services:
   app:
     image: adhocore/lemp:8.1
     # For different app you can use different names. (eg: )
