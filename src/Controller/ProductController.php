@@ -14,6 +14,13 @@ use stdClass;
 
 class ProductController extends AutoRotingController
 {
+
+    public const HEADERS = [
+        "Access-Control-Allow-Origin" => "*",
+        "Access-Control-Allow-Headers" => "*",
+        "Access-Control-Allow-Methods" => "*",
+    ];
+
     private EntityManager $em;
 
     public function __construct(EntityManager $em)
@@ -46,7 +53,7 @@ class ProductController extends AutoRotingController
                 $product = [$product];
             }
 
-            return new JsonResponse($product);
+            return new JsonResponse($product, StatusCodeInterface::STATUS_OK, self::HEADERS);
         } catch (HttpNotFoundException $exception) {
             return new JsonResponse(["message" => $exception->getMessage()], StatusCodeInterface::STATUS_NOT_FOUND);
         } catch (Exception $exception) {
@@ -156,5 +163,10 @@ class ProductController extends AutoRotingController
         $this->em->refresh($newProduct);
 
         return $newProduct;
+    }
+
+    public function optionsAction(Request $request, Response $response)
+    {
+        return new JsonResponse(["message" => "Product removed with success."], StatusCodeInterface::STATUS_OK, self::HEADERS);
     }
 }

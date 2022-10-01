@@ -1,3 +1,4 @@
 .vscode
 vendor
 dump.rdb
+node_modules

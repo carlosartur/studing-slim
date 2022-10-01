@@ -14,7 +14,7 @@ services:
       # Here you can also volume php ini settings
       # - /path/to/zz-overrides:/usr/local/etc/php/conf.d/zz-overrides.ini
     ports:
-      - 8080:80
+      - 80:80
       - 8888:8888
       - 3306:3306
     environment:
