@@ -3,10 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Service\Logger;
 use Doctrine\ORM\EntityManager;
 use Exception;
 use Fig\Http\Message\StatusCodeInterface;
 use Laminas\Diactoros\Response\JsonResponse;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
@@ -14,18 +17,10 @@ use stdClass;
 
 class ProductController extends AutoRotingController
 {
-
-    public const HEADERS = [
-        "Access-Control-Allow-Origin" => "*",
-        "Access-Control-Allow-Headers" => "*",
-        "Access-Control-Allow-Methods" => "*",
-    ];
-
-    private EntityManager $em;
-
-    public function __construct(EntityManager $em)
-    {
-        $this->em = $em;
+    public function __construct(
+        private EntityManager $em,
+        private Logger $logger
+    ) {
     }
 
     /**
@@ -39,6 +34,8 @@ class ProductController extends AutoRotingController
     public function getAction(Request $request, Response $response, ?int $id = null): JsonResponse
     {
         try {
+            $this->logger->log(LogLevel::INFO, "Get request");
+
             $repository = $this->em->getRepository(Product::class);
 
             $product = $id
@@ -53,11 +50,28 @@ class ProductController extends AutoRotingController
                 $product = [$product];
             }
 
-            return new JsonResponse($product, StatusCodeInterface::STATUS_OK, self::HEADERS);
+            return new JsonResponse(
+                $product,
+                StatusCodeInterface::STATUS_OK
+            );
         } catch (HttpNotFoundException $exception) {
-            return new JsonResponse(["message" => $exception->getMessage()], StatusCodeInterface::STATUS_NOT_FOUND);
+            $this->logger->logException($exception);
+
+            return new JsonResponse(
+                [
+                    "message" => $exception->getMessage()
+                ],
+                StatusCodeInterface::STATUS_NOT_FOUND
+            );
         } catch (Exception $exception) {
-            return new JsonResponse(["message" => $exception->getMessage()], StatusCodeInterface::STATUS_BAD_REQUEST);
+            $this->logger->logException($exception);
+
+            return new JsonResponse(
+                [
+                    "message" => $exception->getMessage()
+                ],
+                StatusCodeInterface::STATUS_BAD_REQUEST
+            );
         }
     }
 
@@ -71,13 +85,25 @@ class ProductController extends AutoRotingController
     public function postAction(Request $request, Response $response): JsonResponse
     {
         try {
+            $this->logger->log(LogLevel::INFO, "Post request");
+
             $data = $request->getParsedBody();
 
             $newProduct = $this->createNewProduct($data);
 
-            return new JsonResponse($newProduct, StatusCodeInterface::STATUS_CREATED);
+            return new JsonResponse(
+                $newProduct,
+                StatusCodeInterface::STATUS_CREATED
+            );
         } catch (Exception $exception) {
-            return new JsonResponse(["message" => $exception->getMessage()], StatusCodeInterface::STATUS_BAD_REQUEST);
+            $this->logger->logException($exception);
+
+            return new JsonResponse(
+                [
+                    "message" => $exception->getMessage()
+                ],
+                StatusCodeInterface::STATUS_BAD_REQUEST
+            );
         }
     }
 
@@ -92,6 +118,8 @@ class ProductController extends AutoRotingController
     public function putAction(Request $request, Response $response, int $id = null): JsonResponse
     {
         try {
+            $this->logger->log(LogLevel::INFO, "Put request");
+
             $repository = $this->em->getRepository(Product::class);
 
             $product = $repository->findOneBy(compact("id"));
@@ -99,7 +127,10 @@ class ProductController extends AutoRotingController
             if (!$product) {
                 $newProduct = $this->createNewProduct($request->getParsedBody());
 
-                return new JsonResponse($newProduct, StatusCodeInterface::STATUS_CREATED);
+                return new JsonResponse(
+                    $newProduct,
+                    StatusCodeInterface::STATUS_CREATED
+                );
             }
 
             $product->fillDataFromRequest($request->getParsedBody());
@@ -108,11 +139,28 @@ class ProductController extends AutoRotingController
 
             $this->em->refresh($product);
 
-            return new JsonResponse($product);
+            return new JsonResponse(
+                $product,
+                StatusCodeInterface::STATUS_OK
+            );
         } catch (HttpNotFoundException $exception) {
-            return new JsonResponse(["message" => $exception->getMessage()], StatusCodeInterface::STATUS_NOT_FOUND);
+            $this->logger->logException($exception);
+
+            return new JsonResponse(
+                [
+                    "message" => $exception->getMessage()
+                ],
+                StatusCodeInterface::STATUS_NOT_FOUND
+            );
         } catch (Exception $exception) {
-            return new JsonResponse(["message" => $exception->getMessage()], StatusCodeInterface::STATUS_BAD_REQUEST);
+            $this->logger->logException($exception);
+
+            return new JsonResponse(
+                [
+                    "message" => $exception->getMessage()
+                ],
+                StatusCodeInterface::STATUS_BAD_REQUEST
+            );
         }
     }
 
@@ -127,6 +175,8 @@ class ProductController extends AutoRotingController
     public function deleteAction(Request $request, Response $response, int $id = null): JsonResponse
     {
         try {
+            $this->logger->log(LogLevel::INFO, "Delete request");
+
             $repository = $this->em->getRepository(Product::class);
 
             $product = $repository->findOneBy(compact("id"));
@@ -139,11 +189,30 @@ class ProductController extends AutoRotingController
 
             $this->em->flush();
 
-            return new JsonResponse(["message" => "Product removed with success."]);
+            return new JsonResponse(
+                [
+                    "message" => "Product removed with success."
+                ],
+                StatusCodeInterface::STATUS_OK
+            );
         } catch (HttpNotFoundException $exception) {
-            return new JsonResponse(["message" => $exception->getMessage()], StatusCodeInterface::STATUS_NOT_FOUND);
+            $this->logger->logException($exception);
+
+            return new JsonResponse(
+                [
+                    "message" => $exception->getMessage()
+                ],
+                StatusCodeInterface::STATUS_NOT_FOUND
+            );
         } catch (Exception $exception) {
-            return new JsonResponse(["message" => $exception->getMessage()], StatusCodeInterface::STATUS_BAD_REQUEST);
+            $this->logger->logException($exception);
+
+            return new JsonResponse(
+                [
+                    "message" => $exception->getMessage()
+                ],
+                StatusCodeInterface::STATUS_BAD_REQUEST
+            );
         }
     }
 
@@ -167,6 +236,6 @@ class ProductController extends AutoRotingController
 
     public function optionsAction(Request $request, Response $response)
     {
-        return new JsonResponse(["message" => "Product removed with success."], StatusCodeInterface::STATUS_OK, self::HEADERS);
+        return $response;
     }
 }

@@ -8,17 +8,17 @@ use App\Controller\AutoRotingController;
 use Exception;
 use Fig\Http\Message\StatusCodeInterface;
 use Laminas\Diactoros\Response\JsonResponse;
+use Psr\Log\LoggerInterface;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 
 final class UserController extends AutoRotingController
 {
-    private EntityManager $em;
-
-    public function __construct(EntityManager $em)
-    {
-        $this->em = $em;
+    public function __construct(
+        private EntityManager $em,
+        private LoggerInterface $logger,
+    ) {
     }
 
     public function getAction(Request $request, Response $response, ?int $id = null)

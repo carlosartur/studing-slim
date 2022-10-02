@@ -42,75 +42,9 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary" @click="saveProduct()">Salvar produto</button>
+                    <button type="button" class="btn btn-primary">Salvar produto</button>
                 </div>
             </div>
         </div>
     </div>
 </template>
-
-<script>
-
-class Product {
-    name = "";
-    price = 0;
-    stock = 0;
-    method = "POST";
-
-    constructor(name, price, stock, id) {
-        this.name = name;
-        this.price = price * 100;
-        this.stock = stock;
-        this.id = id;
-        if (this.id) {
-            this.method = "PUT";
-        }
-    }
-
-    async saveProduct() {
-        try {
-            const method = this.method;
-            const url = "http://localhost/product" + (this.id ? `/${this.id}` : "");
-
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    "Content-Type": "application/json",
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': '*',
-                    'Access-Control-Request-Headers': 'Content-Type, Authorization',
-                    'Access-Control-Allow-Methods': 'PUT, POST, GET, DELETE, OPTIONS'
-                },
-                body: JSON.stringify(this),
-            });
-
-            const data = await response.json();
-            window.location.reload();
-        } catch (error) {
-            alert("Não foi possível salvar o produto.");
-            console.error(error);
-        }
-    }
-
-    toJSON() {
-        let data = Object.assign({}, this);
-        delete data["method"];
-        return data;
-    }
-}
-
-export default {
-    name: "modal-product",
-    methods: {
-        saveProduct() {
-            const prod = new Product(
-                document.getElementById("product-name-input").value,
-                document.getElementById("product-price-input").value,
-                document.getElementById("product-stock-input").value,
-                document.getElementById("product-id-input").value,
-            );
-            prod.saveProduct();
-        }
-    }
-};
-</script>

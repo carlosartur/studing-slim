@@ -6,7 +6,8 @@
         "doctrine/orm": "^2.13",
         "symfony/cache": "^6.1",
         "uma/dic": "^3.0",
-        "cocur/slugify": "^4.2"
+        "cocur/slugify": "^4.2",
+        "psr/log": "^3.0"
     },
     "require-dev": {
         "symfony/var-dumper": "^6.1"

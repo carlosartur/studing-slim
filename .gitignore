@@ -2,3 +2,5 @@
 vendor
 dump.rdb
 node_modules
+log/*
+!log/.gitkeep

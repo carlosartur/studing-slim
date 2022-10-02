@@ -7,7 +7,8 @@
             <div class="card-body">
                 <div class="float-end">
                     <div class="btn-group" role="group" aria-label="Basic outlined example">
-                        <button type="button" class="btn btn-success" @click="edit(modal)">Adicionar produto</button>
+                        <button type="button" class="btn btn-success" @click="editAddModal(modal)">Adicionar
+                            produto</button>
                     </div>
                 </div>
                 <br>
@@ -28,8 +29,13 @@
                             <tr v-for="(product, index) in products">
                                 <td>{{ product.name }}</td>
                                 <td>{{ product.slug }}</td>
-                                <td>{{ (product.price / 100).toLocaleString("pt-BR", {style:"currency", currency:"BRL"})
-                                }}
+                                <td>
+                                    {{
+                                    (product.price / 100).toLocaleString("pt-BR", {
+                                        style:"currency",
+                                        currency:"BRL"
+                                    })
+                                    }}
                                 </td>
                                 <td>{{ product.stock }}</td>
                                 <td>{{ (new Date(product.created_at.date)).toLocaleString() }}</td>
@@ -37,9 +43,9 @@
                                 <td>
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-success edit-button"
-                                            @click="edit(modal, product)">Editar</button>
+                                            @click="editAddModal(modal, product)">Editar</button>
                                         <button type="button" class="btn btn-danger remove-button"
-                                            @click="edit(product)">&times;</button>
+                                            @click="removeModal(modal, product)">&times;</button>
                                     </div>
                                 </td>
                             </tr>
@@ -60,7 +66,7 @@ import { Modal } from 'bootstrap';
 export default {
     name: "list-products",
     methods: {
-        edit: function (modal, product = null) {
+        editAddModal: function (modal, product = null) {
             modal.show();
 
             if (!product) {
@@ -75,6 +81,9 @@ export default {
             document.getElementById("product-price-input").value = product.price / 100;
             document.getElementById("product-stock-input").value = product.stock;
             document.getElementById("product-id-input").value = product.id;
+        },
+        removeModal: (modal, product) => {
+
         },
     },
     data() {
