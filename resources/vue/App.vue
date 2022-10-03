@@ -1,6 +1,7 @@
 <script setup>
 import ProductList from "./components/ProductList.vue";
 import ProductAddEditVue from "./components/ProductAddEdit.vue";
+import ProductRemoval from "./components/ProductRemoval.vue";
 import { RouterView } from "vue-router";
 import "bootstrap/dist/css/bootstrap.min.css";
 </script>
@@ -9,6 +10,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
     <div class="container">
         <ProductList></ProductList>
         <ProductAddEditVue></ProductAddEditVue>
+        <ProductRemoval></ProductRemoval>
     </div>
 </template>
 

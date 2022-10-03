@@ -32,8 +32,8 @@
                                 <td>
                                     {{
                                     (product.price / 100).toLocaleString("pt-BR", {
-                                        style:"currency",
-                                        currency:"BRL"
+                                    style:"currency",
+                                    currency:"BRL"
                                     })
                                     }}
                                 </td>
@@ -45,7 +45,7 @@
                                         <button type="button" class="btn btn-success edit-button"
                                             @click="editAddModal(modal, product)">Editar</button>
                                         <button type="button" class="btn btn-danger remove-button"
-                                            @click="removeModal(modal, product)">&times;</button>
+                                            @click="removeModal(removeModalPrompt, product)">&times;</button>
                                     </div>
                                 </td>
                             </tr>
@@ -83,14 +83,17 @@ export default {
             document.getElementById("product-id-input").value = product.id;
         },
         removeModal: (modal, product) => {
-
+            modal.show();
+            document.getElementById("product-name-removal").innerHTML = product.name;
+            document.getElementById("product-id-to-remove-input").value = product.id;
         },
     },
     data() {
         return {
             products: null,
             totalOfProducts: null,
-            modal: null
+            modal: null,
+            removeModalPrompt: null,
         };
     },
     async created() {
@@ -110,6 +113,7 @@ export default {
     },
     mounted() {
         this.modal = new Modal(document.getElementById('editAddProductModal'));
+        this.removeModalPrompt = new Modal(document.getElementById('productRemoval'));
     }
 };
 </script>

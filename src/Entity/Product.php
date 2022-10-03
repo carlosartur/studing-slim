@@ -69,6 +69,8 @@ final class Product implements JsonSerializable
             $requestBody = (object) $requestBody;
         }
 
+        $this->setUpdatedAt(new DateTime());
+
         if (isset($requestBody->name)) {
             $this->setName($requestBody->name);
         }

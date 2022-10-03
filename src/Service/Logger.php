@@ -40,7 +40,7 @@ class Logger implements LoggerInterface
             "line" => $exception->getLine(),
             "file" => $exception->getFile(),
             "message" => $exception->getMessage(),
-            "trace" => $exception->getTraceAsString(),
+            "trace" => explode(PHP_EOL, $exception->getTraceAsString()),
         ], JSON_PRETTY_PRINT);
 
         $this->log($level, $logMessage);

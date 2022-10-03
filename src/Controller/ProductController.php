@@ -122,6 +122,7 @@ class ProductController extends AutoRotingController
 
             $repository = $this->em->getRepository(Product::class);
 
+            /** @var Product $product */
             $product = $repository->findOneBy(compact("id"));
 
             if (!$product) {
